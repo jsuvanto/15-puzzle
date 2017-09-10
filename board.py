@@ -1,3 +1,4 @@
+# random is required for the shuffle method.
 import random
 
 # String used to represent the empty tile.
@@ -6,7 +7,12 @@ EMPTYSTRING = "*"
 # Moves are stored in a dictionary to access them easily.
 # Consider self.__empty and MOVES[direction] as vectors. The sum of
 # these two vectors is the new position of the empty tile.
-MOVES = {"u": [-1, 0], "d": [1, 0], "l": [0, -1], "r": [0, 1]}
+MOVES = {
+    "u": [-1, 0],
+    "d": [1, 0],
+    "l": [0, -1],
+    "r": [0, 1]
+}
 
 
 class Board:
@@ -22,11 +28,13 @@ class Board:
         self.__board = []
 
         # Fill the board with tiles, except leave the last tile empty.
+        # Keep track of how many tiles are stored.
         tilecount = 1
         for row in range(rows):
             self.__board.append([])
             for col in range(cols):
                 if tilecount == self.__size:
+                    # The last tile is the empty tile.
                     self.__board[row].append(EMPTYSTRING)
                 else:
                     self.__board[row].append(tilecount)
@@ -35,11 +43,18 @@ class Board:
         # Remember the location of the empty tile
         self.__empty = [rows - 1, cols - 1]
 
-    # Draw the board. TODO: consider changing this to __repr__
+    # Draw the board.
     def draw(self):
+        # Calculate maximum width for the tile field.
+        # "- 1" makes sure there is no extra space padding in the tile.
+        # This could happen if the board size is eg. 100 (digits),
+        # but because the 100th tile is empty, only two digits are required
+        # (highest number drawn is 99).
+        # "+ 1" stands for the space in front of the value.
+        maxwidth = len(str(self.__size - 1)) + 1
         for row in self.__board:
             for col in row:
-                print("{:>3}".format(str(col)), end="")
+                print("{:>{}}".format(str(col), maxwidth), end="")
             print()
         print()
 
@@ -86,7 +101,9 @@ class Board:
         movecount = 0
         movesequence = ""
         while movecount < moves:
+            # TODO: choose from legal moves to shuffle slightly faster
             direction = random.choice("udlr")
+            # Only count successful moves.
             if self.move(direction):
                 movecount += 1
                 # Debug information
